@@ -52,22 +52,55 @@ interface WorldStats {
     uptime: number;
 }
 
-declare type CommandExecutor = (handle: ServerHandle, context: any, args: string[]) => void;
+declare type SettingIdType = string;
+interface Setting<T> {
+    id: SettingIdType;
+    name: string;
+    type: SettingType;
+    current: T;
+    default: T;
+}
+interface IntSetting extends Setting<number> {
+    type: "int";
+    minimum: number;
+    maximum: number;
+}
+interface FloatSetting extends Setting<number> {
+    type: "float";
+    minimum: number;
+    maximum: number;
+}
+interface BoolSetting extends Setting<boolean> {
+    type: "bool";
+}
+interface StringSetting extends Setting<string> {
+    type: "string";
+}
+interface OptionSetting extends Setting<string> {
+    type: "option";
+    options: string[];
+}
+interface SetSetting extends Setting<string[]> {
+    type: "set";
+}
+declare type AnySetting = SettingTypes[SettingType];
+declare type AnySettingValue = number | boolean | string;
+
+declare type SettingType = "int" | "float" | "bool" | "string" | "option" | "set";
+declare type SettingTypes = {
+    "int": IntSetting;
+    "float": FloatSetting;
+    "bool": BoolSetting;
+    "string": StringSetting;
+    "option": OptionSetting;
+    "set": SetSetting;
+};
+
 interface CommandGeneratorInfo {
     name: string;
     args: string;
     desc: string;
     exec: CommandExecutor;
-}
-interface GenCommandTable {
-    columns: {
-        text: string;
-        headPad: string;
-        emptyPad: string;
-        rowPad: string;
-        separated: boolean;
-    }[];
-    rows: string[][];
 }
 
 declare type LogEvent = (date: Date, level: "DEBUG" | "ACCESS" | "INFO" | "WARN" | "ERROR" | "FATAL", message: string) => void;

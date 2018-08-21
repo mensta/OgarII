@@ -6,7 +6,6 @@ TODO 1.2.1
 
 TODO 1.2.0
 - Implement cell type assigning system
-- Implement playerlist command
 - Implement message size assertion for the modern protocol
 - Implement adding a new player to specified world if its id has been given in HTTP request path
 
