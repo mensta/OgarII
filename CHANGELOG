@@ -9,6 +9,15 @@ TODO 1.2.0
 - Implement message size assertion for the modern protocol
 - Implement adding a new player to specified world if its id has been given in HTTP request path
 
+1.2.0-dev @ 2018-8-22
+- Added setting name suggestions when an unknown setting was referenced
+- Refactored settings and made them more strict
+- Renamed setting listenerForbiddenIPs to listenerBlacklistedIPs
+- New setting, listenerWhitelistedIPs - an empty list defaults to no whitelisting
+- Renamed setting listeningPort to listenerPort
+- Renamed setting ejectedLoss to ejectingLoss
+- Renamed setting ejectedCellBoost to ejectedBoost
+
 1.1.10 @ 2018-8-18
 - Removed delay between commands, no idea why was it there in the first place
 - Default gamemodes are now registered at ServerHandle instead of GamemodeList

@@ -53,9 +53,9 @@ interface WorldStats {
 }
 
 declare type SettingIdType = string;
+declare type SettingType = "int" | "float" | "bool" | "string" | "option" | "set";
 interface Setting<T> {
     id: SettingIdType;
-    name: string;
     type: SettingType;
     current: T;
     default: T;
@@ -83,10 +83,6 @@ interface OptionSetting extends Setting<string> {
 interface SetSetting extends Setting<string[]> {
     type: "set";
 }
-declare type AnySetting = SettingTypes[SettingType];
-declare type AnySettingValue = number | boolean | string;
-
-declare type SettingType = "int" | "float" | "bool" | "string" | "option" | "set";
 declare type SettingTypes = {
     "int": IntSetting;
     "float": FloatSetting;
@@ -95,6 +91,9 @@ declare type SettingTypes = {
     "option": OptionSetting;
     "set": SetSetting;
 };
+declare type AnySetting = SettingTypes[SettingType];
+declare type AnySettingValue = number | boolean | string | string[];
+declare type SerializedSettings = Indexed<AnySettingValue>;
 
 interface CommandGeneratorInfo {
     name: string;

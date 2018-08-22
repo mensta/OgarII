@@ -298,7 +298,7 @@ class World {
                 }
             });
         }
-       
+
         for (i = 0, l = this.playerCells.length; i < l; i++) {
             const cell = this.playerCells[i];
             this.autosplitPlayerCell(cell);
@@ -528,8 +528,8 @@ class World {
     }
     /** @param {Player} player */
     ejectFromPlayer(player) {
-        const dispersion = this.settings.ejectDispersion;
-        const loss = this.settings.ejectingLoss * this.settings.ejectingLoss;
+        const dispersion = this.settings.ejectedDispersion;
+        const loss = this.settings.ejectedLoss * this.settings.ejectedLoss;
         const router = player.router;
         const l = player.ownedCells.length;
         for (let i = 0; i < l; i++) {
@@ -547,7 +547,7 @@ class World {
             const a = Math.atan2(dx, dy) - dispersion + Math.random() * 2 * dispersion;
             newCell.boost.dx = Math.sin(a);
             newCell.boost.dy = Math.cos(a);
-            newCell.boost.d = this.settings.ejectedCellBoost;
+            newCell.boost.d = this.settings.ejectedBoost;
             this.addCell(newCell);
             this.setCellAsBoosting(newCell);
             cell.squareSize -= loss;

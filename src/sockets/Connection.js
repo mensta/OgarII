@@ -11,7 +11,7 @@ class Connection extends Router {
         this.remoteAddress = webSocket._socket.remoteAddress;
         this.webSocket = webSocket;
         this.lastActivityTime = Date.now();
-        
+
         this.upgradeLevel = 0;
         /** @type {Protocol} */
         this.protocol = null;
@@ -75,8 +75,8 @@ class Connection extends Router {
     createPlayer() {
         super.createPlayer();
         if (this.settings.matchmakerNeedsQueuing) {
-            this.globalChat.directMessage(null, this, "This server requires players to be queued.");
-            this.globalChat.directMessage(null, this, "Try spawning to enqueue.");
+            this.listener.globalChat.directMessage(null, this, "This server requires players to be queued.");
+            this.listener.globalChat.directMessage(null, this, "Try spawning to enqueue.");
         } else this.handle.matchmaker.toggleQueued(this);
     }
 
@@ -87,7 +87,7 @@ class Connection extends Router {
         const globalChat = this.listener.globalChat;
         if (message.length >= 2 && message[0] === "/") {
             if (!this.handle.chatCommands.execute(this, message.slice(1)))
-                globalChat.directMessage(null, this, "unknown command, execute /help for the list of commands");
+                globalChat.directMessage(null, this, "unknown command");
         }
         else message && globalChat.broadcast(this, message);
     }
@@ -130,7 +130,7 @@ class Connection extends Router {
             if (cell.eatenBy !== null) eat.push(cell);
             del.push(cell);
         }
-        
+
         if (player.state === 1 || player.state === 2)
             this.protocol.onSpectatePosition(player.viewArea);
         if (this.handle.tick % 4 === 0)

@@ -1,3 +1,6 @@
+const logSettingsPath = "./log-settings.json";
+const logSettingsEncoding = "utf-8";
+
 let settings = {
     showingConsole: {
         PRINT: true,
@@ -26,9 +29,9 @@ let settings = {
 const { EOL } = require("os");
 const fs = require("fs");
 
-if (fs.existsSync("./log-settings.json"))
-    settings = Object.assign(settings, JSON.parse(fs.readFileSync("./log-settings.json", "utf-8")));
-else fs.writeFileSync("./log-settings.json", JSON.stringify(settings, null, 4), "utf-8");
+if (fs.existsSync(logSettingsPath))
+    settings = Object.assign(settings, JSON.parse(fs.readFileSync(logSettingsPath, logSettingsEncoding)));
+else fs.writeFileSync(logSettingsPath, JSON.stringify(settings, null, 4), logSettingsEncoding);
 
 /**
  * @param {Date=} date
@@ -148,6 +151,9 @@ process.once("exit", function(code) {
 /**
  * @param {ServerHandle} handle
  */
-module.exports = (handle) => handle.logger.onlog = write;
+module.exports = (handle) => {
+    handle.logger.onlog = write;
+    return handle.logger;
+}
 
 const ServerHandle = require("../src/ServerHandle");

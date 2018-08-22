@@ -1,30 +1,34 @@
 const fs = require("fs");
-const DefaultSettings = require("../src/Settings");
-const ServerHandle = require("../src/ServerHandle");
-const { genCommand } = require("../src/commands/CommandList");
 const readline = require("readline");
+const ServerHandle = require("../src/ServerHandle");
+const Settings = require("../src/settings/Settings");
+const { genCommand } = require("../src/commands/CommandList");
 
-/** @returns {DefaultSettings} */
+const settingsPath = "./settings.json";
+const settingsEncoding = "utf-8";
+
+/** @returns {SerializedSettings} */
 function readSettings() {
-    try { return JSON.parse(fs.readFileSync("./settings.json", "utf-8")); }
-    catch (e) {
-        console.log("caught error while parsing/reading settings.json:", e.stack);
+    try {
+        if (!fs.existsSync(settingsPath)) return null;
+        return JSON.parse(fs.readFileSync(settingsPath, settingsEncoding));
+    } catch (e) {
+        console.error("caught error while parsing/reading settings.json:", e.stack);
         process.exit(1);
     }
 }
-/** @param {DefaultSettings} settings */
+/** @param {Settings} settings */
 function overwriteSettings(settings) {
-    fs.writeFileSync("./settings.json", JSON.stringify(settings, null, 4), "utf-8");
+    fs.writeFileSync(settingsPath, JSON.stringify(settings.export(), null, 4), "utf-8");
 }
 
-if (!fs.existsSync("./settings.json"))
-    overwriteSettings(DefaultSettings);
 let settings = readSettings();
 
-const currentHandle = new ServerHandle(settings);
+const currentHandle = new ServerHandle();
+const logger = require("./log-handler")(currentHandle);
+
+if (settings != null) currentHandle.setSettings(settings);
 overwriteSettings(currentHandle.settings);
-require("./log-handler")(currentHandle);
-const logger = currentHandle.logger;
 
 let commandStreamClosing = false;
 const commandStream = readline.createInterface({
@@ -42,7 +46,7 @@ function ask() {
         if (!(input = input.trim())) return;
         logger.printFile(`@ ${input}`);
         if (!currentHandle.commands.execute(null, input))
-            logger.warn(`unknown command ${input}`);
+            logger.warn("unknown command");
     });
 }
 logger.inform("command stream open");
@@ -67,8 +71,9 @@ currentHandle.commands.register(
     genCommand({
         name: "reload",
         args: "",
-        desc: "reload the settings from local settings.json",
+        desc: "load the settings from file",
         exec: (handle, context, args) => {
+            if (!fs.existsSync(settingsPath)) logger.onError(`settings file wasn't found at ${settings}!`);
             handle.setSettings(readSettings());
             logger.print("done");
         }
@@ -76,7 +81,7 @@ currentHandle.commands.register(
     genCommand({
         name: "save",
         args: "",
-        desc: "save the current settings to settings.json",
+        desc: "save the settings to file",
         exec: (handle, context, args) => {
             overwriteSettings(handle.settings);
             logger.print("done");

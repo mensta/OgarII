@@ -27,9 +27,9 @@ class Listener {
 
     open() {
         if (this.listenerSocket !== null) return false;
-        this.logger.debug(`listener opening at ${this.settings.listeningPort}`);
+        this.logger.debug(`listener opening at ${this.settings.listenerPort}`);
         this.listenerSocket = new WebSocketServer({
-            port: this.settings.listeningPort,
+            port: this.settings.listenerPort,
             verifyClient: this.verifyClient.bind(this)
         }, this.onOpen.bind(this));
         this.listenerSocket.on("connection", this.onConnection.bind(this));
@@ -44,8 +44,8 @@ class Listener {
     }
 
     /**
-     * @param {{req: any, origin: string}} info 
-     * @param {*} response 
+     * @param {{req: any, origin: string}} info
+     * @param {*} response
      */
     verifyClient(info, response) {
         /**
@@ -62,8 +62,14 @@ class Listener {
             this.logger.debug(`listenerAcceptedOrigins doesn't contain ${info.origin}`);
             return void response(false, 403, "Forbidden");
         }
-        if (this.settings.listenerForbiddenIPs.indexOf(address) !== -1) {
-            this.logger.debug(`listenerForbiddenIPs contains ${address}, dropping connection`);
+        const blacklistedIPs = this.settings.listenerBlacklistedIPs;
+        const whitelistedIPs = this.settings.listenerWhitelistedIPs;
+        if (blacklistedIPs.indexOf(address) !== -1) {
+            this.logger.debug(`listenerBlacklistedIPs contains ${address}, dropping connection`);
+            return void response(false, 403, "Forbidden");
+        }
+        if (whitelistedIPs.length > 0 && whitelistedIPs.indexOf(address) !== -1) {
+            this.logger.debug(`listenerWhitelistedIPs doesn't contain ${address}, dropping connection`);
             return void response(false, 403, "Forbidden");
         }
         if (this.settings.listenerMaxConnectionsPerIP > 0) {
@@ -77,7 +83,7 @@ class Listener {
         response(true);
     }
     onOpen() {
-        this.logger.inform(`listener open at ${this.settings.listeningPort}`);
+        this.logger.inform(`listener open at ${this.settings.listenerPort}`);
     }
 
     /**

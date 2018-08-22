@@ -1,9 +1,10 @@
-const Settings = require("./Settings");
+const Settings = require("./settings/Settings");
 
 const { CommandList } = require("./commands/CommandList");
 const GamemodeList = require("./gamemodes/GamemodeList");
 const ProtocolStore = require("./protocols/ProtocolStore");
 
+const DefaultSettings = require("./settings/DefaultSettings");
 const DefaultCommands = require("./commands/DefaultCommands");
 const FFAGamemode = require("./gamemodes/FFA");
 const TeamsGamemode = require("./gamemodes/Teams");
@@ -22,12 +23,8 @@ const Player = require("./worlds/Player");
 const World = require("./worlds/World");
 
 class ServerHandle {
-    /**
-     * @param {Settings} settings
-     */
-    constructor(settings) {
-        /** @type {Settings} */
-        this.settings = Settings;
+    constructor() {
+        this.settings = new Settings();
 
         this.protocols = new ProtocolStore();
         this.gamemodes = new GamemodeList(this);
@@ -43,12 +40,12 @@ class ServerHandle {
         this.tick = NaN;
         this.tickDelay = NaN;
         this.stepMult = NaN;
-        
+
         this.ticker = new Ticker(40);
         this.ticker.add(this._onTick.bind(this));
         this.stopwatch = new Stopwatch();
         this.logger = new Logger();
-        
+
         this.listener = new Listener(this);
         this.matchmaker = new Matchmaker(this);
         /** @type {Identified<World>} */
@@ -56,19 +53,26 @@ class ServerHandle {
         /** @type {Identified<Player>} */
         this.players = { };
 
+        DefaultSettings(this.settings);
         DefaultCommands(this.commands, this.chatCommands);
         this.protocols.register(ModernProtocol, LegacyProtocol);
         this.gamemodes.register(FFAGamemode, TeamsGamemode, LMSGamemode);
-        this.setSettings(settings);
     }
 
     get version() { return version; }
 
     /**
-     * @param {Settings} settings
+     * @param {SerializedSettings} newSettings
      */
-    setSettings(settings) {
-        this.settings = Object.assign({ }, Settings, settings);
+    setSettings(newSettings) {
+        const oldSettings = this.settings.export();
+        try {
+            this.settings.import(newSettings);
+        } catch (ex) {
+            this.logger.onError("failed loading new settings, reverting:");
+            this.logger.onError(ex.message);
+            this.settings.import(oldSettings);
+        }
         this.tickDelay = 1000 / this.settings.serverUpdateFrequency;
         this.ticker.step = this.tickDelay;
         this.stepMult = this.tickDelay / 40;
@@ -77,7 +81,7 @@ class ServerHandle {
     start() {
         if (this.running) return false;
         this.logger.inform("starting");
-        
+
         this.gamemodes.setGamemode(this.settings.serverGamemode);
         this.startTime = new Date();
         this.averageTickTime = this.tick = 0;

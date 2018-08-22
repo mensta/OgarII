@@ -79,5 +79,5 @@ module.exports = {
         };
     },
 
-    version: "1.2.0-dev1"
+    version: "1.2.0-dev"
 };

@@ -1,6 +1,6 @@
 {
     "name": "ogarii",
-    "version": "1.2.0-dev1",
+    "version": "1.2.0-dev",
     "description": "FOSS implementation of a private Agar.io gameserver",
     "author": {
         "name": "Luka Djokovic",
@@ -12,6 +12,6 @@
     },
     "license": "Apache-2.0",
     "dependencies": {
-        "uws": "^9.148.0"
+        "uws": "10.148.1"
     }
 }

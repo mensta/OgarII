@@ -45,6 +45,28 @@ function table(contents, eol) {
 }
 
 /**
+ * @param {SettingIdType} id
+ */
+function splitSettingId(id) {
+    let items = [], reg, i = 0;
+    while ((reg = /([a-z]+)|([A-Z][a-z]+)|([A-Z])/.exec(id)) != null && ++i < 10) {
+        const capture = reg[1] || reg[2] || reg[3];
+        items.push(capture.toLowerCase()), id = id.replace(capture, "");
+    }
+    return items;
+}
+/**
+ * @param {string[]} a
+ * @param {string[]} b
+ */
+function getSplitSettingHits(a, b) {
+    let hits = 0;
+    for (let i = 0, l = b.length; i < l; i++)
+        if (a.indexOf(b[i]) !== -1) hits++;
+    return hits;
+}
+
+/**
  * @param {CommandList} commands
  * @param {CommandList} chatCommands
  */
@@ -130,17 +152,34 @@ module.exports = (commands, chatCommands) => {
         }),
         genCommand({
             name: "setting",
-            args: "<name> [value]",
+            args: "<id> [value]",
             desc: "change/print the value of a setting",
             exec: (handle, context, args) => {
-                if (args.length < 1) return void handle.logger.print("no setting name provided");
-                if (!handle.settings.hasOwnProperty(args[0]))
-                    return void handle.logger.print("no such setting");
-                if (args.length >= 2) {
-                    handle.settings[args[0]] = eval(args.slice(1).join(" "));
-                    handle.setSettings(handle.settings);
+                if (args.length < 1) return void handle.logger.print("no setting id provided");
+                const settingId = args[0];
+                if (!handle.settings.hasOwnProperty(settingId)) {
+                    const settingIdSplit = splitSettingId(settingId);
+                    const possible = Object.keys(handle.settings.store)
+                        .map(v => { return { id: v, hits: getSplitSettingHits(splitSettingId(v), settingIdSplit) }; })
+                        .sort((a, b) => b.hits - a.hits)
+                        .filter((v) => v.hits > 0)
+                        .filter((v, i, array) => array[0].hits === v.hits)
+                        .map(v => v.id);
+                    let printing = "no such setting";
+                    if (possible.length > 0) {
+                        printing += `; did you mean ${possible.slice(0, 3).join(", ")}`
+                        if (possible.length > 3) printing += `, ${possible.length - 3} other`;
+                        printing += "?"
+                    }
+                    return void handle.logger.print(printing);
                 }
-                handle.logger.print(handle.settings[args[0]]);
+                if (args.length >= 2) {
+                    const settingValue = eval(args.slice(1).join(" "));
+                    const serlialized = handle.settings.export();
+                    serlialized[settingId] = settingValue;
+                    handle.setSettings(serlialized);
+                }
+                handle.logger.print(handle.settings[settingId]);
             }
         }),
         genCommand({
