@@ -9,6 +9,10 @@ TODO 1.2.0
 - Implement message size assertion for the modern protocol
 - Implement adding a new player to specified world if its id has been given in HTTP request path
 
+1.2.0-dev @ 2018-8-23
+- Sort out generics mess with QuadTree
+- Minor JSDoc updates
+
 1.2.0-dev @ 2018-8-22
 - Added setting name suggestions when an unknown setting was referenced
 - Refactored settings and made them more strict

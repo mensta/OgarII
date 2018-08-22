@@ -45,7 +45,7 @@ class Listener {
 
     /**
      * @param {{req: any, origin: string}} info
-     * @param {*} response
+     * @param {(result: boolean, code: number, name: string) => any} response
      */
     verifyClient(info, response) {
         /**

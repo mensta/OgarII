@@ -1,5 +1,10 @@
 const { throwIfBadNumber } = require("../primitives/Misc");
 
+/**
+ * @typedef {{ _root: QuadTree<T>, range: Range, item: T }} QuadItem
+ * @template T
+ */
+
 /** @abstract */
 class Cell {
     /**
@@ -23,8 +28,12 @@ class Cell {
         this._y = y;
         this._size = size;
         this._color = color;
-        /** @type {Range} */
-        this.range = null;
+        /** @type {QuadItem<Cell>} */
+        this.quadItem = {
+            item: this,
+            range: null,
+            _root: null
+        };
 
         this.isBoosting = false;
         /** @type {Boost} */
@@ -142,3 +151,4 @@ module.exports = Cell;
 
 const World = require("../worlds/World");
 const Player = require("../worlds/Player");
+const QuadTree = require("../primitives/QuadTree");

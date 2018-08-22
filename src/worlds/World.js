@@ -47,7 +47,7 @@ class World {
 
         /** @type {Range} */
         this.border = { x: NaN, y: NaN, w: NaN, h: NaN };
-        /** @type {QuadTree} */
+        /** @type {QuadTree<Cell>} */
         this.finder = null;
 
         /**
@@ -108,7 +108,7 @@ class World {
     /** @param {Cell} cell */
     addCell(cell) {
         cell.exists = true;
-        cell.range = {
+        cell.quadItem.range = {
             x: cell.x,
             y: cell.y,
             w: cell.size,
@@ -119,6 +119,25 @@ class World {
         cell.onSpawned();
         this.handle.gamemode.onNewCell(cell);
     }
+    /** @param {Cell} cell */
+    updateCell(cell) {
+        const range = cell.quadItem.range;
+        range.x = cell.x;
+        range.y = cell.y;
+        range.w = range.h = cell.size;
+        this.finder.update(cell);
+    }
+    /** @param {Cell} cell */
+    removeCell(cell) {
+        this.handle.gamemode.onCellRemove(cell);
+        cell.onRemoved();
+        this.finder.remove(cell);
+        delete cell.range;
+        this.setCellAsNotBoosting(cell);
+        this.cells.splice(this.cells.indexOf(cell), 1);
+        cell.exists = false;
+    }
+
     /** @param {Cell} cell */
     setCellAsBoosting(cell) {
         if (cell.isBoosting) return false;
@@ -132,24 +151,6 @@ class World {
         cell.isBoosting = false;
         this.boostingCells.splice(this.boostingCells.indexOf(cell), 1);
         return true;
-    }
-    /** @param {Cell} cell */
-    updateCell(cell) {
-        cell.range.x = cell.x;
-        cell.range.y = cell.y;
-        cell.range.w = cell.size;
-        cell.range.h = cell.size;
-        this.finder.update(cell);
-    }
-    /** @param {Cell} cell */
-    removeCell(cell) {
-        this.handle.gamemode.onCellRemove(cell);
-        cell.onRemoved();
-        this.finder.remove(cell);
-        delete cell.range;
-        this.setCellAsNotBoosting(cell);
-        this.cells.splice(this.cells.indexOf(cell), 1);
-        cell.exists = false;
     }
 
     /** @param {Player} player */
@@ -289,12 +290,12 @@ class World {
         for (i = 0; i < this.boostingCells.length; i++) {
             const cell = this.boostingCells[i];
             if (cell.type !== 2 && cell.type !== 3) continue;
-            this.finder.search(cell.range, /** @param {Cell} other */ (other) => {
-                if (cell.id === other.id) return;
-                switch (cell.getEatResult(other)) {
-                    case 1: rigid.push(cell, other); break;
-                    case 2: eat.push(cell, other); break;
-                    case 3: eat.push(other, cell); break;
+            this.finder.search(cell.range, (other) => {
+                if (cell.id === other.item.id) return;
+                switch (cell.getEatResult(other.item)) {
+                    case 1: rigid.push(cell, other.item); break;
+                    case 2: eat.push(cell, other.item); break;
+                    case 3: eat.push(other.item, cell); break;
                 }
             });
         }
@@ -310,12 +311,12 @@ class World {
 
         for (i = 0; i < l; i++) {
             const cell = this.playerCells[i];
-            this.finder.search(cell.range, /** @param {Cell} other */ (other) => {
-                if (cell.id === other.id) return;
-                switch (cell.getEatResult(other)) {
-                    case 1: rigid.push(cell, other); break;
-                    case 2: eat.push(cell, other); break;
-                    case 3: eat.push(other, cell); break;
+            this.finder.search(cell.range, (other) => {
+                if (cell.id === other.item.id) return;
+                switch (cell.getEatResult(other.item)) {
+                    case 1: rigid.push(cell, other.item); break;
+                    case 2: eat.push(cell, other.item); break;
+                    case 3: eat.push(other.item, cell); break;
                 }
             });
         }

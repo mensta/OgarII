@@ -1,17 +1,22 @@
 const { intersects, fullyIntersects, getQuadIntersect, getQuadFullIntersect } = require("../primitives/Misc");
 
 /**
- * @typedef {{ __root: undefined, range: Range }} QuadItem
- * @typedef {{ __root: QuadTree, range: Range }} InsertedQuadItem
+ * @typedef {{ _root: QuadTree<T>, range: Range, item: T }} QuadItem
+ * @template T
+ */
+/**
  * @typedef {-1 | 0 | 1 | 2 | 3} DefiniteQuad
-*/
+ */
 
+/**
+ * @template T
+ */
 class QuadTree {
     /**
      * @param {Range} range
      * @param {number} maxLevel
      * @param {number} maxItems
-     * @param {QuadTree=} root 
+     * @param {QuadTree<T>=} root 
      */
     constructor(range, maxLevel, maxItems, root) {
         this.root = root;
@@ -22,19 +27,19 @@ class QuadTree {
         this.maxItems = maxItems;
         this.range = range;
 
-        /** @type {InsertedQuadItem[]} */
+        /** @type {QuadItem<T>[]} */
         this.items = [];
         this.hasSplit = false;
     }
 
     destroy() {
         for (let i = 0, l = this.items.length; i < l; i++)
-            delete this.items[i].__root;
+            delete this.items[i]._root;
         if (!this.hasSplit) return;
         for (i = 0; i < 4; i++) this.branches[i].destroy();
     }
     /** 
-     * @param {QuadItem} item
+     * @param {QuadItem<T>} item
      */
     insert(item) {
         let quad = this;
@@ -44,16 +49,16 @@ class QuadTree {
             if (quadrant === -1) break;
             quad = quad.branches[quadrant];
         }
-        item.__root = quad;
+        item._root = quad;
         quad.items.push(item);
         quad.split();
     }
     /** 
-     * @param {InsertedQuadItem} item
+     * @param {QuadItem<T>} item
      */
     update(item) {
-        const oldQuad = item.__root;
-        let newQuad = item.__root;
+        const oldQuad = item._root;
+        let newQuad = item._root;
         while (true) {
             if (!newQuad.root) break;
             newQuad = newQuad.root;
@@ -68,17 +73,17 @@ class QuadTree {
         if (oldQuad === newQuad) return;
         oldQuad.items.splice(oldQuad.items.indexOf(item), 1);
         newQuad.items.push(item);
-        item.__root = newQuad;
+        item._root = newQuad;
         oldQuad.merge();
         newQuad.split();
     }
     /** 
-     * @param {InsertedQuadItem} item
+     * @param {QuadItem<T>} item
      */
     remove(item) {
-        const quad = item.__root;
+        const quad = item._root;
         quad.items.splice(quad.items.indexOf(item), 1);
-        delete item.__root;
+        delete item._root;
         quad.merge();
     }
 
@@ -101,7 +106,7 @@ class QuadTree {
         for (let i = 0, l = this.items.length, quadrant; i < l; i++) {
             quadrant = this.getQuadrant(this.items[i].range);
             if (quadrant === -1) continue;
-            delete this.items[i].__root;
+            delete this.items[i]._root;
             this.branches[quadrant].insert(this.items[i]);
             this.items.splice(i, 1); i--; l--;
         }
@@ -123,7 +128,7 @@ class QuadTree {
 
     /**
      * @param {Range} range
-     * @param {(item: InsertedQuadItem) => void} callback
+     * @param {(item: QuadItem<T>) => void} callback
      */
     search(range, callback) {
         for (let i = 0, l = this.items.length, item; i < l; i++)
@@ -141,7 +146,7 @@ class QuadTree {
     }
     /**
      * @param {Range} range
-     * @param {(item: InsertedQuadItem) => boolean} selector
+     * @param {(item: QuadItem<T>) => boolean} selector
      * @returns {boolean}
      */
     containsAny(range, selector) {
@@ -161,7 +166,7 @@ class QuadTree {
         return false;
     }
 
-    /** @returns {InsertedQuadItem[]} */
+    /** @returns {QuadItem<T>[]} */
     getItems() {
         if (!this.hasSplit) return this.items.slice(0);
         else return this.items.slice(0).concat(this.branches[0].getItems(),
