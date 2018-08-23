@@ -12,6 +12,7 @@ TODO 1.2.0
 1.2.0-dev @ 2018-8-23
 - Sort out generics mess with QuadTree
 - Minor JSDoc updates
+- New setting, worldMinCount - you can now have a world constantly be there
 
 1.2.0-dev @ 2018-8-22
 - Added setting name suggestions when an unknown setting was referenced

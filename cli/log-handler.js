@@ -15,7 +15,7 @@ let settings = {
     showingFile: {
         PRINT: true,
         FILE: true,
-        DEBUG: true,
+        DEBUG: false,
         ACCESS: true,
         INFO: true,
         WARN: true,

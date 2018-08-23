@@ -68,8 +68,7 @@ class Matchmaker {
             if (!this.handle.gamemode.canJoinWorld(world)) continue;
             if (world.stats.external >= this.handle.settings.worldMaxPlayers)
                 continue;
-            if (bestWorld === null || world.stats.external < bestWorld.stats.external)
-                bestWorld = world;
+            if (bestWorld === null) { bestWorld = world; break; }
         }
         if (bestWorld !== null) return bestWorld;
         else if (Object.keys(this.handle.worlds).length < this.handle.settings.worldMaxCount)

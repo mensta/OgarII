@@ -87,6 +87,9 @@ class ServerHandle {
         this.averageTickTime = this.tick = 0;
         this.running = true;
 
+        for (let i = 0; i < this.settings.worldMinCount; i++)
+            this.createWorld();
+
         this.listener.open();
         this.ticker.start();
         this.gamemode.onHandleStart();
@@ -134,6 +137,7 @@ class ServerHandle {
      * @returns {boolean}
      */
     removeWorld(id) {
+        console.log(new Error().stack);
         if (!this.worlds.hasOwnProperty(id)) return false;
         this.gamemode.onWorldDestroy(this.worlds[id]);
         this.worlds[id].destroy();

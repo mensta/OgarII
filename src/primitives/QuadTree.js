@@ -16,7 +16,7 @@ class QuadTree {
      * @param {Range} range
      * @param {number} maxLevel
      * @param {number} maxItems
-     * @param {QuadTree<T>=} root 
+     * @param {QuadTree<T>=} root
      */
     constructor(range, maxLevel, maxItems, root) {
         this.root = root;
@@ -38,7 +38,7 @@ class QuadTree {
         if (!this.hasSplit) return;
         for (i = 0; i < 4; i++) this.branches[i].destroy();
     }
-    /** 
+    /**
      * @param {QuadItem<T>} item
      */
     insert(item) {
@@ -53,7 +53,7 @@ class QuadTree {
         quad.items.push(item);
         quad.split();
     }
-    /** 
+    /**
      * @param {QuadItem<T>} item
      */
     update(item) {
@@ -77,7 +77,7 @@ class QuadTree {
         oldQuad.merge();
         newQuad.split();
     }
-    /** 
+    /**
      * @param {QuadItem<T>} item
      */
     remove(item) {
@@ -87,7 +87,7 @@ class QuadTree {
         quad.merge();
     }
 
-    /** 
+    /**
      * @private
      */
     split() {
@@ -111,7 +111,7 @@ class QuadTree {
             this.items.splice(i, 1); i--; l--;
         }
     }
-    /** 
+    /**
      * @private
      */
     merge() {
@@ -131,8 +131,10 @@ class QuadTree {
      * @param {(item: QuadItem<T>) => void} callback
      */
     search(range, callback) {
-        for (let i = 0, l = this.items.length, item; i < l; i++)
-            if (intersects(range, (item = this.items[i]).range)) callback(item);
+        for (let i = 0, l = this.items.length, item; i < l; i++) {
+            item = this.items[i];
+            if (intersects(range, item.range)) callback(item);
+        }
         if (!this.hasSplit) return;
         const quad = getQuadIntersect(range, this.range);
         if (quad.t) {
@@ -150,9 +152,11 @@ class QuadTree {
      * @returns {boolean}
      */
     containsAny(range, selector) {
-        for (let i = 0, l = this.items.length, item; i < l; i++)
-            if (intersects(range, (item = this.items[i]).range) && (!selector || selector(item)))
+        for (let i = 0, l = this.items.length, item; i < l; i++) {
+            item = this.items[i];
+            if (intersects(range, item.range) && (!selector || selector(item)))
                 return true;
+        }
         if (!this.hasSplit) return false;
         const quad = getQuadIntersect(range, this.range);
         if (quad.t) {

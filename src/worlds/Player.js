@@ -63,7 +63,7 @@ class Player {
     }
 
     updateViewArea() {
-        if (this.world === null) return;        
+        if (this.world === null) return;
         let s;
         switch (this.state) {
             case -1: this.score = NaN; break;
@@ -111,7 +111,7 @@ class Player {
     }
 
     updateVisibleCells() {
-        if (this.world === null) return;
+        if (!this.hasWorld) return;
         delete this.lastVisibleCells;
         this.lastVisibleCells = this.visibleCells;
         let visibleCells = this.visibleCells = { };
@@ -119,7 +119,7 @@ class Player {
             const cell = this.ownedCells[i];
             visibleCells[cell.id] = cell;
         }
-        this.world.finder.search(this.viewArea, (cell) => visibleCells[cell.id] = cell);
+        this.world.finder.search(this.viewArea, (item) => visibleCells[item.item.id] = item.item);
     }
 
     checkDisconnect() {
