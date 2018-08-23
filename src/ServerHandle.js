@@ -137,7 +137,6 @@ class ServerHandle {
      * @returns {boolean}
      */
     removeWorld(id) {
-        console.log(new Error().stack);
         if (!this.worlds.hasOwnProperty(id)) return false;
         this.gamemode.onWorldDestroy(this.worlds[id]);
         this.worlds[id].destroy();

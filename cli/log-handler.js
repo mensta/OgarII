@@ -6,7 +6,7 @@ let settings = {
         PRINT: true,
         FILE: false,
         DEBUG: false,
-        ACCESS: false,
+        ACCESS: true,
         INFO: true,
         WARN: true,
         ERROR: true,
@@ -15,7 +15,7 @@ let settings = {
     showingFile: {
         PRINT: true,
         FILE: true,
-        DEBUG: false,
+        DEBUG: true,
         ACCESS: true,
         INFO: true,
         WARN: true,
