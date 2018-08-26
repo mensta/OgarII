@@ -9,7 +9,7 @@ class Mothercell extends Cell {
      * @param {World} world
      */
     constructor(world, x, y) {
-        const size = world.settings.mothercellSize;
+        const size = world.settings.mothercellMinSize;
         super(world, x, y, size, { r: 206, g: 99, b: 99 });
 
         this.pelletCount = 0;
@@ -26,24 +26,24 @@ class Mothercell extends Cell {
 
     onTick() {
         const settings = this.world.settings;
-        const mothercellSize = settings.mothercellSize;
+        const minSize = settings.mothercellMinSize;
         const pelletSize = settings.pelletMinSize;
-        const minSpawnSqSize = mothercellSize * mothercellSize + pelletSize * pelletSize;
+        const minSpawnSqSize = minSize * minSize + pelletSize * pelletSize;
 
         this.activePelletFormQueue += settings.mothercellActiveSpawnSpeed * this.world.handle.stepMult;
         this.passivePelletFormQueue += Math.random() * settings.mothercellPassiveSpawnChance * this.world.handle.stepMult;
-    
+
         while (this.activePelletFormQueue > 0) {
             if (this.squareSize > minSpawnSqSize)
                 this.spawnPellet(), this.squareSize -= pelletSize * pelletSize;
-            else if (this.size > mothercellSize)
-                this.size = mothercellSize;
+            else if (this.size > minSize)
+                this.size = minSize;
             this.activePelletFormQueue--;
         }
         while (this.passivePelletFormQueue > 0) {
             if (this.pelletCount < settings.mothercellMaxPellets)
                 this.spawnPellet();
-            this.passivePelletFormQueue--;            
+            this.passivePelletFormQueue--;
         }
     }
     spawnPellet() {

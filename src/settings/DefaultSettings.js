@@ -62,7 +62,7 @@ module.exports = (settings) => {
 
     settings.register({ id: "ejectedSize",                     type: "float" , default: 43       , minimum: 1        , maximum: UINT16MAX });
     settings.register({ id: "ejectedLoss",                     type: "float" , default: 48       , minimum: 1        , maximum: UINT16MAX });
-    settings.register({ id: "ejectedDispersion",               type: "float" , default: PI_2 / 8 , minimum: 0        , maximum: PI_2      });
+    settings.register({ id: "ejectedDispersion",               type: "float" , default: PI_2 / 24, minimum: 0        , maximum: PI_2      });
     settings.register({ id: "ejectedBoost",                    type: "float" , default: 780      , minimum: 0                             });
 
     settings.register({ id: "mothercellMinSize",               type: "float" , default: 149      , minimum: 1        , maximum: UINT16MAX });
@@ -85,7 +85,7 @@ module.exports = (settings) => {
     settings.register({ id: "playerMinEjectSize",              type: "float" , default: 60       , minimum: 1        , maximum: UINT16MAX });
     settings.register({ id: "playerMaxCells",                  type: "int"   , default: 16       , minimum: 1                             });
 
-    settings.register({ id: "playerMoveMult",                  type: "float" , default: 32       , minimum: 0                             });
+    settings.register({ id: "playerMoveMult",                  type: "float" , default: 1        , minimum: 0                             });
     settings.register({ id: "playerSplitBoost",                type: "float" , default: 780      , minimum: 0                             });
     settings.register({ id: "playerNoCollideDelay",            type: "int"   , default: 13       , minimum: 0                             });
     settings.register({ id: "playerNoMergeDelay",              type: "int"   , default: 15       , minimum: 0                             });

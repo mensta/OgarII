@@ -473,7 +473,7 @@ module.exports = (commands, chatCommands) => {
             args: "",
             desc: "get your world's id",
             exec: (handle, context, args) => {
-                const worldId = context.hasPlayer ? !context.player.hasWorld ? context.player.world.id : null : null;
+                const worldId = context.hasPlayer ? context.player.hasWorld ? context.player.world.id : null : null;
                 handle.listener.globalChat.directMessage(
                     null,
                     context,

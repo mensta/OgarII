@@ -73,7 +73,7 @@ class Cell {
      * @returns {boolean}
      */
     get isAgitated() { throw new Error("Must be overriden"); }
-    /** 
+    /**
      * @abstract
      * @returns {boolean}
     */

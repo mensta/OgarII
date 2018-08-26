@@ -115,7 +115,7 @@ class World {
             h: cell.size
         };
         this.cells.push(cell);
-        this.finder.insert(cell);
+        this.finder.insert(cell.quadItem);
         cell.onSpawned();
         this.handle.gamemode.onNewCell(cell);
     }
@@ -125,14 +125,14 @@ class World {
         range.x = cell.x;
         range.y = cell.y;
         range.w = range.h = cell.size;
-        this.finder.update(cell);
+        this.finder.update(cell.quadItem);
     }
     /** @param {Cell} cell */
     removeCell(cell) {
         this.handle.gamemode.onCellRemove(cell);
         cell.onRemoved();
-        this.finder.remove(cell);
-        delete cell.range;
+        this.finder.remove(cell.quadItem);
+        delete cell.quadItem;
         this.setCellAsNotBoosting(cell);
         this.cells.splice(this.cells.indexOf(cell), 1);
         cell.exists = false;
@@ -290,7 +290,7 @@ class World {
         for (i = 0; i < this.boostingCells.length; i++) {
             const cell = this.boostingCells[i];
             if (cell.type !== 2 && cell.type !== 3) continue;
-            this.finder.search(cell.range, (other) => {
+            cell.quadItem._root.search(cell.quadItem.range, (other) => {
                 if (cell.id === other.item.id) return;
                 switch (cell.getEatResult(other.item)) {
                     case 1: rigid.push(cell, other.item); break;
@@ -311,7 +311,7 @@ class World {
 
         for (i = 0; i < l; i++) {
             const cell = this.playerCells[i];
-            this.finder.search(cell.range, (other) => {
+            cell.quadItem._root.search(cell.quadItem.range, (other) => {
                 if (cell.id === other.item.id) return;
                 switch (cell.getEatResult(other.item)) {
                     case 1: rigid.push(cell, other.item); break;
@@ -364,7 +364,8 @@ class World {
         this.compileStatistics();
         this.handle.gamemode.compileLeaderboard(this);
 
-        if (this.stats.external <= 0) this.handle.removeWorld(this.id);
+        if (this.stats.external <= 0 && Object.keys(this.handle.worlds).length > this.settings.worldMinCount)
+            this.handle.removeWorld(this.id);
     }
 
     /**

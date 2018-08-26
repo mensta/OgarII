@@ -87,6 +87,9 @@ class ServerHandle {
         this.averageTickTime = this.tick = 0;
         this.running = true;
 
+        for (let i = 0; i < this.settings.worldMinCount; i++)
+            this.createWorld();
+
         this.listener.open();
         this.ticker.start();
         this.gamemode.onHandleStart();
